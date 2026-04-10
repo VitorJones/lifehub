@@ -1,7 +1,12 @@
 import { PrismaClient } from "@prisma/client";
+import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { subDays, subMonths, setDate } from "date-fns";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaLibSql({
+  url: process.env.TURSO_DATABASE_URL ?? "file:./prisma/dev.db",
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("🌱 Semeando dados...");
