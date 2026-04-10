@@ -1,0 +1,257 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// FINANCEIRO
+// ==========================================
+
+model Conta {
+  id           String      @id @default(cuid())
+  nome         String
+  tipo         String      // "corrente" | "poupanca" | "carteira" | "investimento" | "outro"
+  saldoInicial Float       @default(0)
+  cor          String      @default("#3b82f6")
+  icone        String      @default("Wallet")
+  ativo        Boolean     @default(true)
+  transacoes   Transacao[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model Cartao {
+  id            String         @id @default(cuid())
+  nome          String
+  bandeira      String         // "visa" | "mastercard" | "elo" | "amex"
+  limite        Float
+  diaFechamento Int
+  diaVencimento Int
+  cor           String         @default("#a855f7")
+  ativo         Boolean        @default(true)
+  transacoes    Transacao[]
+  faturas       Fatura[]
+  parcelamentos Parcelamento[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Fatura {
+  id            String   @id @default(cuid())
+  cartaoId      String
+  cartao        Cartao   @relation(fields: [cartaoId], references: [id])
+  mesReferencia String   // "2026-04"
+  status        String   @default("aberta") // "aberta" | "fechada" | "paga"
+  totalFatura   Float    @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@unique([cartaoId, mesReferencia])
+}
+
+model Parcelamento {
+  id           String   @id @default(cuid())
+  descricao    String
+  valorTotal   Float
+  numParcelas  Int
+  parcelaAtual Int      @default(1)
+  valorParcela Float
+  cartaoId     String?
+  cartao       Cartao?  @relation(fields: [cartaoId], references: [id])
+  categoriaId  String?
+  dataInicio   DateTime
+  ativo        Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Alocacao {
+  id         String   @id @default(cuid())
+  nome       String
+  percentual Float?
+  valorFixo  Float?
+  cor        String   @default("#3b82f6")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Investimento {
+  id              String   @id @default(cuid())
+  nome            String
+  tipo            String   // "renda_fixa" | "renda_variavel" | "caixinha"
+  instituicao     String?
+  valorInvestido  Float    @default(0)
+  rendimentoAnual Float?
+  tipoRendimento  String?  // "cdi" | "prefixado" | "ipca+" | "selic" | "outro"
+  dataInicio      DateTime
+  dataVencimento  DateTime?
+  valorAtual      Float    @default(0)
+  ehCaixinha      Boolean  @default(false)
+  metaValor       Float?
+  aportes         Aporte[]
+  ativo           Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Aporte {
+  id             String       @id @default(cuid())
+  investimentoId String
+  investimento   Investimento @relation(fields: [investimentoId], references: [id], onDelete: Cascade)
+  valor          Float
+  tipo           String       @default("deposito") // "deposito" | "resgate"
+  data           DateTime
+  createdAt      DateTime     @default(now())
+}
+
+model Categoria {
+  id         String      @id @default(cuid())
+  nome       String
+  tipo       String      // "receita" | "despesa"
+  cor        String
+  icone      String
+  transacoes Transacao[]
+  createdAt  DateTime    @default(now())
+}
+
+model Transacao {
+  id          String   @id @default(cuid())
+  descricao   String
+  valor       Float
+  tipo        String   // "receita" | "despesa"
+  data        DateTime
+  categoriaId String
+  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  contaId     String?
+  conta       Conta?    @relation(fields: [contaId], references: [id])
+  cartaoId    String?
+  cartao      Cartao?   @relation(fields: [cartaoId], references: [id])
+  recorrente  Boolean   @default(false)
+  observacao  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ==========================================
+// HABITOS & METAS
+// ==========================================
+
+model Habito {
+  id         String           @id @default(cuid())
+  nome       String
+  descricao  String?
+  icone      String
+  cor        String
+  frequencia String
+  diasSemana String?
+  registros  RegistroHabito[]
+  ativo      Boolean          @default(true)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+}
+
+model RegistroHabito {
+  id        String   @id @default(cuid())
+  habitoId  String
+  habito    Habito   @relation(fields: [habitoId], references: [id], onDelete: Cascade)
+  data      DateTime
+  concluido Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@unique([habitoId, data])
+}
+
+model Meta {
+  id          String    @id @default(cuid())
+  titulo      String
+  descricao   String?
+  categoria   String
+  tipo        String
+  valorAlvo   Float?
+  valorAtual  Float?
+  unidade     String?
+  prazo       DateTime?
+  concluida   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ==========================================
+// AGENDA
+// ==========================================
+
+model Evento {
+  id               String    @id @default(cuid())
+  titulo           String
+  descricao        String?
+  dataInicio       DateTime
+  dataFim          DateTime?
+  local            String?
+  cor              String    @default("#3b82f6")
+  diaInteiro       Boolean   @default(false)
+  lembrete         Int?
+  tipo             String    @default("evento")    // "evento" | "aniversario"
+  recorrencia      String?                         // "diario" | "semanal" | "mensal" | "anual" | "personalizado"
+  diasRecorrencia  String?                         // JSON [0,1,2,3,4,5,6] para recorrência personalizada
+  excecoes         String?                         // JSON ["yyyy-MM-dd"] — datas excluídas de recorrência
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+// ==========================================
+// ÁGUA
+// ==========================================
+
+model RegistroAgua {
+  id        String   @id @default(cuid())
+  data      DateTime // dia (armazenado como UTC midnight)
+  ml        Int      @default(0)     // ml consumidos no dia
+  metaMl    Int      @default(2000)  // meta diária em ml
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([data])
+}
+
+// ==========================================
+// AMIGOS
+// ==========================================
+
+model Amigo {
+  id                String    @id @default(cuid())
+  nome              String
+  apelido           String?
+  telefone          String?
+  email             String?
+  instagram         String?
+  aniversario       String?   // "MM-DD" (sem ano) ou "YYYY-MM-DD" (com ano)
+  grupos            String?   // JSON string[] ex: ["família","trabalho"]
+  notas             String?
+  cor               String    @default("#a855f7")
+  favorito          Boolean   @default(false)
+  ultimoContato     DateTime?
+  frequenciaContato String?   // "semanal"|"quinzenal"|"mensal"|"trimestral"
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+// ==========================================
+// TAREFAS
+// ==========================================
+
+model Tarefa {
+  id          String    @id @default(cuid())
+  titulo      String
+  descricao   String?
+  status      String    @default("pendente")
+  prioridade  String    @default("media")
+  dataLimite  DateTime?
+  tags        String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
