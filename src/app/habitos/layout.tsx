@@ -15,8 +15,8 @@ export default function HabitosLayout({ children }: { children: React.ReactNode 
   return (
     <div className="flex flex-col h-full">
       <div className="border-b border-[#27272a] bg-[#0a0a0b] sticky top-0 z-10">
-        <div className="px-8 pt-8 pb-0">
-          <h1 className="text-2xl font-heading font-semibold text-[#f5f5f5] mb-5">
+        <div className="px-4 md:px-8 pt-5 md:pt-8 pb-0">
+          <h1 className="text-xl md:text-2xl font-heading font-semibold text-[#f5f5f5] mb-4 md:mb-5">
             Hábitos & Metas
           </h1>
           <div className="flex gap-1">

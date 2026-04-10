@@ -28,12 +28,12 @@ export default function FinanceiroLayout({ children }: { children: React.ReactNo
     <div className="flex flex-col h-full">
       {/* Header fixo com título e tab bar */}
       <div className="border-b border-[#27272a] bg-[#0a0a0b] sticky top-0 z-10">
-        <div className="px-8 pt-8 pb-0">
-          <h1 className="text-2xl font-heading font-semibold text-[#f5f5f5] mb-5">
+        <div className="px-4 md:px-8 pt-5 md:pt-8 pb-0">
+          <h1 className="text-xl md:text-2xl font-heading font-semibold text-[#f5f5f5] mb-4 md:mb-5">
             Financeiro
           </h1>
-          {/* Tab bar */}
-          <div className="flex">
+          {/* Tab bar scrollável horizontalmente no mobile */}
+          <div className="flex overflow-x-auto scrollbar-none -mx-4 md:mx-0 px-4 md:px-0">
             {tabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = tab.exact
@@ -45,7 +45,7 @@ export default function FinanceiroLayout({ children }: { children: React.ReactNo
                   key={tab.href}
                   href={tab.href}
                   className={`
-                    flex-1 flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium
+                    shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 text-[11px] font-medium
                     transition-all duration-200 border-b-2 -mb-px
                     ${
                       isActive
