@@ -511,16 +511,16 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Linha inferior: Eventos + Metas + Amigos ──────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
         {/* Próximos eventos */}
         <Card className="flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Calendar size={16} className="text-[#3b82f6]" />
-              <h2 className="font-heading font-semibold text-[#f5f5f5] text-sm">Próximos Eventos</h2>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <Calendar size={16} className="text-[#3b82f6] shrink-0" />
+              <h2 className="font-heading font-semibold text-[#f5f5f5] text-sm truncate">Próximos Eventos</h2>
             </div>
-            <Link href="/agenda" className="text-[10px] text-[#52525b] hover:text-[#a1a1aa] flex items-center gap-0.5 transition-colors">
+            <Link href="/agenda" className="text-[10px] text-[#52525b] hover:text-[#a1a1aa] flex items-center gap-0.5 transition-colors shrink-0">
               Ver tudo <ArrowRight size={10} />
             </Link>
           </div>
@@ -562,12 +562,12 @@ export default function DashboardPage() {
 
         {/* Metas em progresso */}
         <Card className="flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Target size={16} className="text-[#a855f7]" />
-              <h2 className="font-heading font-semibold text-[#f5f5f5] text-sm">Metas</h2>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <Target size={16} className="text-[#a855f7] shrink-0" />
+              <h2 className="font-heading font-semibold text-[#f5f5f5] text-sm truncate">Metas</h2>
             </div>
-            <Link href="/habitos/metas" className="text-[10px] text-[#52525b] hover:text-[#a1a1aa] flex items-center gap-0.5 transition-colors">
+            <Link href="/habitos/metas" className="text-[10px] text-[#52525b] hover:text-[#a1a1aa] flex items-center gap-0.5 transition-colors shrink-0">
               Ver tudo <ArrowRight size={10} />
             </Link>
           </div>
@@ -629,12 +629,12 @@ export default function DashboardPage() {
 
         {/* Amigos — Aniversários + Atenção */}
         <Card className="flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Users size={16} className="text-[#ec4899]" />
-              <h2 className="font-heading font-semibold text-[#f5f5f5] text-sm">Amigos</h2>
+          <div className="flex items-center justify-between gap-2 mb-4">
+            <div className="flex items-center gap-2 min-w-0">
+              <Users size={16} className="text-[#ec4899] shrink-0" />
+              <h2 className="font-heading font-semibold text-[#f5f5f5] text-sm truncate">Amigos</h2>
             </div>
-            <Link href="/amigos" className="text-[10px] text-[#52525b] hover:text-[#a1a1aa] flex items-center gap-0.5 transition-colors">
+            <Link href="/amigos" className="text-[10px] text-[#52525b] hover:text-[#a1a1aa] flex items-center gap-0.5 transition-colors shrink-0">
               Ver tudo <ArrowRight size={10} />
             </Link>
           </div>
