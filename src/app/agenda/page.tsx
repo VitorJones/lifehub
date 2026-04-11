@@ -689,8 +689,8 @@ export default function AgendaPage() {
   return (
     <div className="flex overflow-hidden" style={{ height: "100vh" }}>
 
-      {/* ── Calendário ──────────────────────────────────────────────────── */}
-      <div className="flex-1 flex flex-col p-6 gap-4 min-w-0 overflow-hidden">
+      {/* ── Calendário — oculto no mobile ───────────────────────────────── */}
+      <div className="hidden md:flex flex-1 flex-col p-6 gap-4 min-w-0 overflow-hidden">
 
         {/* Header */}
         <div className="flex items-center justify-between flex-shrink-0">
@@ -814,11 +814,11 @@ export default function AgendaPage() {
         </div>
       </div>
 
-      {/* ── Sidebar ─────────────────────────────────────────────────────── */}
-      <div className="w-72 border-l border-[#27272a] flex flex-col overflow-hidden bg-[#0a0a0b] flex-shrink-0">
+      {/* ── Sidebar — full width no mobile ──────────────────────────────── */}
+      <div className="flex-1 md:flex-none md:w-72 border-l border-[#27272a] flex flex-col overflow-hidden bg-[#0a0a0b] shrink-0">
 
         {/* Dia selecionado */}
-        <div className="p-5 border-b border-[#27272a] flex-shrink-0">
+        <div className="p-4 md:p-5 border-b border-[#27272a] shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div>
               <p className="text-[10px] text-[#52525b] uppercase tracking-wide mb-0.5 capitalize">

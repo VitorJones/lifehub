@@ -434,7 +434,7 @@ function AmigoCard({
       <div className="flex items-start gap-3">
         {/* Avatar */}
         <div
-          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-heading font-semibold text-base flex-shrink-0 relative"
+          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-heading font-semibold text-base shrink-0 relative"
           style={{ background: amigo.cor }}
         >
           {iniciais(amigo.nome)}
@@ -663,7 +663,7 @@ export default function AmigosPage() {
   const temFiltro = busca || filtroGrupo || filtroSaude;
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
 
       {/* ── Header ──────────────────────────────────────────────────────── */}
       <div className="flex items-center justify-between mb-6">
@@ -688,17 +688,17 @@ export default function AmigosPage() {
 
       {/* ── Resumo rápido ──────────────────────────────────────────────── */}
       {amigos.length > 0 && (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
           <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
             <p className="text-xs text-[#52525b] mb-1">Total de amigos</p>
-            <p className="text-2xl font-heading font-semibold text-[#a855f7]">{amigos.length}</p>
+            <p className="text-xl md:text-2xl font-heading font-semibold text-[#a855f7]">{amigos.length}</p>
           </div>
           <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
               <Cake size={12} className="text-[#ec4899]" />
               <p className="text-xs text-[#52525b]">Aniversários este mês</p>
             </div>
-            <p className="text-2xl font-heading font-semibold text-[#ec4899]">{anivMes.length}</p>
+            <p className="text-xl md:text-2xl font-heading font-semibold text-[#ec4899]">{anivMes.length}</p>
             {anivMes.length > 0 && (
               <p className="text-[11px] text-[#52525b] mt-1 truncate">
                 {anivMes.slice(0, 2).map((a) => a.apelido || a.nome.split(" ")[0]).join(", ")}
@@ -711,7 +711,7 @@ export default function AmigosPage() {
               <Heart size={12} className="text-[#ef4444]" />
               <p className="text-xs text-[#52525b]">Precisam de atenção</p>
             </div>
-            <p className="text-2xl font-heading font-semibold text-[#ef4444]">{precisamAtencao.length}</p>
+            <p className="text-xl md:text-2xl font-heading font-semibold text-[#ef4444]">{precisamAtencao.length}</p>
           </div>
         </div>
       )}
@@ -765,7 +765,7 @@ export default function AmigosPage() {
 
       {/* ── Grid de amigos ──────────────────────────────────────────────── */}
       {loading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-52 bg-[#111113] border border-[#27272a] rounded-xl animate-pulse" />
           ))}
@@ -793,7 +793,7 @@ export default function AmigosPage() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {amigosFiltrados.map((a) => (
             <AmigoCard
               key={a.id}

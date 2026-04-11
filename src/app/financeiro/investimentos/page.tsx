@@ -186,22 +186,22 @@ export default function InvestimentosPage() {
   const ehCaixinha = formInv.tipo === "caixinha";
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Cards resumo */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
           <p className="text-xs text-[#52525b] mb-1">Total Investido</p>
-          <p className="text-2xl font-mono font-semibold text-[#22c55e]">{formatarMoeda(totalInvestido)}</p>
+          <p className="text-lg md:text-2xl font-mono font-semibold text-[#22c55e] truncate">{formatarMoeda(totalInvestido)}</p>
         </div>
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
           <p className="text-xs text-[#52525b] mb-1">Rendimento Estimado</p>
-          <p className="text-2xl font-mono font-semibold" style={{ color: rendimentoEstimado >= 0 ? "#22c55e" : "#ef4444" }}>
+          <p className="text-lg md:text-2xl font-mono font-semibold truncate" style={{ color: rendimentoEstimado >= 0 ? "#22c55e" : "#ef4444" }}>
             {rendimentoEstimado >= 0 ? "+" : ""}{formatarMoeda(rendimentoEstimado)}
           </p>
         </div>
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
           <p className="text-xs text-[#52525b] mb-1">Total em Caixinhas</p>
-          <p className="text-2xl font-mono font-semibold text-[#a855f7]">{formatarMoeda(totalCaixinhas)}</p>
+          <p className="text-lg md:text-2xl font-mono font-semibold text-[#a855f7] truncate">{formatarMoeda(totalCaixinhas)}</p>
         </div>
       </div>
 
@@ -240,7 +240,7 @@ export default function InvestimentosPage() {
                   return (
                     <div key={inv.id} className="bg-[#111113] border border-[#27272a] rounded-xl px-5 py-4 hover:border-[#3f3f46] transition-all duration-200 group">
                       <div className="flex items-start gap-4">
-                        <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#22c55e]/10 flex-shrink-0">
+                        <div className="w-9 h-9 rounded-lg flex items-center justify-center bg-[#22c55e]/10 shrink-0">
                           <TrendingUp size={16} className="text-[#22c55e]" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -264,7 +264,7 @@ export default function InvestimentosPage() {
                                 )}
                               </div>
                             </div>
-                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                               <button
                                 onClick={() => { setModalAporte(inv); setFormAporte(FORM_APORTE_VAZIO); }}
                                 className="flex items-center gap-1 px-2.5 py-1.5 text-xs text-[#3b82f6] border border-[#3b82f6]/30 rounded-lg hover:bg-[#3b82f6]/10 transition-colors"
@@ -280,7 +280,7 @@ export default function InvestimentosPage() {
                             </div>
                           </div>
                         </div>
-                        <div className="text-right flex-shrink-0">
+                        <div className="text-right shrink-0">
                           <p className="font-mono font-semibold text-[#f5f5f5]">{formatarMoeda(inv.valorAtual)}</p>
                           <p className="text-xs mt-0.5" style={{ color: rendPct >= 0 ? "#22c55e" : "#ef4444" }}>
                             {rendPct >= 0 ? "+" : ""}{rendPct.toFixed(2)}%
@@ -303,7 +303,7 @@ export default function InvestimentosPage() {
                 <h3 className="font-medium text-[#f5f5f5] text-sm">Caixinhas</h3>
                 <div className="flex-1 h-px bg-[#27272a]" />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {caixinhas.map((inv) => {
                   const pct = inv.metaValor && inv.metaValor > 0
                     ? Math.min((inv.valorAtual / inv.metaValor) * 100, 100)
@@ -383,9 +383,9 @@ export default function InvestimentosPage() {
                 {aportes.slice(0, 20).map((a) => (
                   <div key={a.id} className="flex items-center gap-3 bg-[#111113] border border-[#27272a] rounded-xl px-4 py-3">
                     {a.tipo === "deposito" ? (
-                      <ArrowDownCircle size={16} className="text-[#22c55e] flex-shrink-0" />
+                      <ArrowDownCircle size={16} className="text-[#22c55e] shrink-0" />
                     ) : (
-                      <ArrowUpCircle size={16} className="text-[#ef4444] flex-shrink-0" />
+                      <ArrowUpCircle size={16} className="text-[#ef4444] shrink-0" />
                     )}
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#f5f5f5]">{a.investimento.nome}</p>

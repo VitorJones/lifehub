@@ -64,7 +64,7 @@ function CardResumo({
         )}
       </div>
       <p className="text-[#a1a1aa] text-sm mb-1">{label}</p>
-      <p className="text-2xl font-mono font-semibold text-[#f5f5f5]">
+      <p className="text-lg md:text-2xl font-mono font-semibold text-[#f5f5f5] truncate">
         {formatarMoeda(valor)}
       </p>
     </div>
@@ -116,7 +116,7 @@ export default function VisaoGeralPage() {
   const totalPorCategoria = resumo?.porCategoria.reduce((a, c) => a + c.total, 0) ?? 0;
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Navegação de mês */}
       <div className="flex items-center gap-3 mb-6">
         <button
@@ -137,7 +137,7 @@ export default function VisaoGeralPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-32 bg-[#111113] border border-[#27272a] rounded-xl animate-pulse" />
           ))}
@@ -145,7 +145,7 @@ export default function VisaoGeralPage() {
       ) : (
         <>
           {/* Cards */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
             <CardResumo
               label="Receitas"
               valor={resumo?.receitas ?? 0}
@@ -170,7 +170,7 @@ export default function VisaoGeralPage() {
           </div>
 
           {/* Gráficos */}
-          <div className="grid grid-cols-2 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
             {/* Evolução mensal */}
             <div className="bg-[#111113] border border-[#27272a] rounded-xl p-5">
               <h2 className="font-heading font-semibold text-[#f5f5f5] mb-5">

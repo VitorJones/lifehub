@@ -78,9 +78,9 @@ export default function MensalPage() {
   const diasSemana = ["Seg", "Ter", "Qua", "Qui", "Sex", "Sáb", "Dom"];
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Nav */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center gap-3 mb-6">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navegarMes(-1)}
@@ -100,23 +100,23 @@ export default function MensalPage() {
         </div>
 
         {/* Totais rápidos */}
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg px-4 py-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg px-3 py-1.5">
             <TrendingUp size={13} className="text-[#22c55e]" />
             <span className="text-xs text-[#a1a1aa]">Receitas</span>
-            <span className="text-sm font-mono font-semibold text-[#22c55e]">{formatarMoeda(totalReceitas)}</span>
+            <span className="text-xs font-mono font-semibold text-[#22c55e]">{formatarMoeda(totalReceitas)}</span>
           </div>
-          <div className="flex items-center gap-2 bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-lg px-4 py-2">
+          <div className="flex items-center gap-1.5 bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-lg px-3 py-1.5">
             <TrendingDown size={13} className="text-[#ef4444]" />
             <span className="text-xs text-[#a1a1aa]">Despesas</span>
-            <span className="text-sm font-mono font-semibold text-[#ef4444]">{formatarMoeda(totalDespesas)}</span>
+            <span className="text-xs font-mono font-semibold text-[#ef4444]">{formatarMoeda(totalDespesas)}</span>
           </div>
         </div>
       </div>
 
-      <div className="flex gap-6">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6">
         {/* Calendário */}
-        <div className="flex-1 bg-[#111113] border border-[#27272a] rounded-xl p-5">
+        <div className="flex-1 bg-[#111113] border border-[#27272a] rounded-xl p-3 md:p-5">
           {/* Cabeçalho dias da semana */}
           <div className="grid grid-cols-7 mb-2">
             {diasSemana.map((d) => (
@@ -199,7 +199,7 @@ export default function MensalPage() {
         </div>
 
         {/* Painel lateral — detalhes do dia */}
-        <div className="w-72 flex-shrink-0">
+        <div className="w-full md:w-72 shrink-0">
           {diaSelecionado ? (
             <div className="bg-[#111113] border border-[#27272a] rounded-xl p-5 sticky top-4">
               <div className="flex items-center justify-between mb-4">
@@ -225,7 +225,7 @@ export default function MensalPage() {
                   {transacoesDia.map((t) => (
                     <div key={t.id} className="flex items-center gap-3 py-2 border-b border-[#1a1a1f] last:border-0">
                       <span
-                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        className="w-2 h-2 rounded-full shrink-0"
                         style={{ background: t.categoria.cor }}
                       />
                       <div className="flex-1 min-w-0">
@@ -233,7 +233,7 @@ export default function MensalPage() {
                         <p className="text-xs text-[#52525b]">{t.categoria.nome}</p>
                       </div>
                       <span
-                        className={`text-sm font-mono font-medium flex-shrink-0 ${
+                        className={`text-sm font-mono font-medium shrink-0 ${
                           t.tipo === "receita" ? "text-[#22c55e]" : "text-[#f5f5f5]"
                         }`}
                       >

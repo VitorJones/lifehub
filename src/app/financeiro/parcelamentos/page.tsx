@@ -112,20 +112,20 @@ export default function ParcelamentosPage() {
     : null;
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Cards resumo */}
-      <div className="grid grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4 mb-6">
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
           <p className="text-xs text-[#52525b] mb-1">Parcelamentos ativos</p>
-          <p className="text-2xl font-mono font-semibold text-[#f5f5f5]">{parcelamentos.length}</p>
+          <p className="text-lg md:text-2xl font-mono font-semibold text-[#f5f5f5]">{parcelamentos.length}</p>
         </div>
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
           <p className="text-xs text-[#52525b] mb-1">Custo mensal</p>
-          <p className="text-2xl font-mono font-semibold text-[#ef4444]">{formatarMoeda(totalMensal)}</p>
+          <p className="text-lg md:text-2xl font-mono font-semibold text-[#ef4444] truncate">{formatarMoeda(totalMensal)}</p>
         </div>
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
           <p className="text-xs text-[#52525b] mb-1">Total restante</p>
-          <p className="text-2xl font-mono font-semibold text-[#eab308]">{formatarMoeda(totalRestante)}</p>
+          <p className="text-lg md:text-2xl font-mono font-semibold text-[#eab308] truncate">{formatarMoeda(totalRestante)}</p>
         </div>
       </div>
 
@@ -165,7 +165,7 @@ export default function ParcelamentosPage() {
               <div key={p.id} className="bg-[#111113] border border-[#27272a] rounded-xl px-5 py-4 hover:border-[#3f3f46] transition-all duration-200">
                 <div className="flex items-start gap-4">
                   {/* Ícone */}
-                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ background: `${cor}20` }}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ background: `${cor}20` }}>
                     <CreditCard size={16} style={{ color: cor }} />
                   </div>
 
@@ -212,14 +212,14 @@ export default function ParcelamentosPage() {
                           style={{ width: `${pct}%`, background: concluido ? "#22c55e" : cor }}
                         />
                       </div>
-                      <span className="text-xs font-mono text-[#a1a1aa] flex-shrink-0">
+                      <span className="text-xs font-mono text-[#a1a1aa] shrink-0">
                         {concluido ? "Concluído" : `${p.parcelaAtual}/${p.numParcelas}`}
                       </span>
                     </div>
                   </div>
 
                   {/* Valor total */}
-                  <div className="text-right flex-shrink-0">
+                  <div className="text-right shrink-0">
                     <p className="font-mono font-semibold text-[#f5f5f5]">{formatarMoeda(p.valorTotal)}</p>
                     <p className="text-xs text-[#52525b]">total</p>
                   </div>

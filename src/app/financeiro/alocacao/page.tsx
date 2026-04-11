@@ -121,9 +121,9 @@ export default function AlocacaoPage() {
   ];
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Cards resumo */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         {[
           { label: "Renda do Mês", valor: formatarMoeda(rendaMensal), cor: "#22c55e" },
           { label: "Total Alocado", valor: formatarMoeda(totalAlocado), cor: "#eab308" },
@@ -132,7 +132,7 @@ export default function AlocacaoPage() {
         ].map((c) => (
           <div key={c.label} className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
             <p className="text-xs text-[#52525b] mb-1">{c.label}</p>
-            <p className="text-xl font-mono font-semibold" style={{ color: c.cor }}>{c.valor}</p>
+            <p className="text-base md:text-xl font-mono font-semibold truncate" style={{ color: c.cor }}>{c.valor}</p>
           </div>
         ))}
       </div>
@@ -152,12 +152,12 @@ export default function AlocacaoPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           <div className="h-64 bg-[#111113] border border-[#27272a] rounded-xl animate-pulse" />
           <div className="h-64 bg-[#111113] border border-[#27272a] rounded-xl animate-pulse" />
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Lista de alocações */}
           <div className="bg-[#111113] border border-[#27272a] rounded-xl p-5">
             <h3 className="font-medium text-[#f5f5f5] mb-4 text-sm">Suas Alocações</h3>
@@ -173,7 +173,7 @@ export default function AlocacaoPage() {
               <div className="space-y-3">
                 {alocacoesComValor.map((a) => (
                   <div key={a.id} className="flex items-center gap-3 group">
-                    <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ background: a.cor }} />
+                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: a.cor }} />
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center justify-between mb-1">
                         <span className="text-sm text-[#f5f5f5] font-medium">{a.nome}</span>
@@ -189,12 +189,12 @@ export default function AlocacaoPage() {
                             }}
                           />
                         </div>
-                        <span className="text-xs text-[#52525b] flex-shrink-0 w-10 text-right">
+                        <span className="text-xs text-[#52525b] shrink-0 w-10 text-right">
                           {a.percentual !== null ? `${a.percentual}%` : `R$`}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
                       <button
                         onClick={() => abrirModal(a)}
                         className="w-6 h-6 rounded flex items-center justify-center text-[#52525b] hover:text-[#a1a1aa] hover:bg-[#1a1a1f] transition-colors"
@@ -213,7 +213,7 @@ export default function AlocacaoPage() {
 
                 {restante > 0 && (
                   <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#27272a]">
-                    <div className="w-3 h-3 rounded-full flex-shrink-0 bg-[#27272a]" />
+                    <div className="w-3 h-3 rounded-full shrink-0 bg-[#27272a]" />
                     <div className="flex-1 flex items-center justify-between">
                       <span className="text-sm text-[#52525b]">Não alocado</span>
                       <span className="text-sm font-mono text-[#52525b]">{formatarMoeda(restante)}</span>
@@ -258,7 +258,7 @@ export default function AlocacaoPage() {
                 <div className="flex-1 space-y-2">
                   {dadosGrafico.map((d, i) => (
                     <div key={i} className="flex items-center gap-2">
-                      <div className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: d.cor }} />
+                      <div className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: d.cor }} />
                       <span className="text-xs text-[#a1a1aa] truncate">{d.name}</span>
                     </div>
                   ))}

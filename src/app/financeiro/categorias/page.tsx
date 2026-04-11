@@ -111,7 +111,7 @@ export default function CategoriasPage() {
         ];
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <div className="flex rounded-lg border border-[#27272a] overflow-hidden">
           {(["", "despesa", "receita"] as const).map((t) => (
@@ -136,7 +136,7 @@ export default function CategoriasPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[0, 1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="h-20 bg-[#111113] border border-[#27272a] rounded-xl animate-pulse" />
           ))}
@@ -161,7 +161,7 @@ export default function CategoriasPage() {
                   <p className="text-[#52525b] text-sm">Nenhuma categoria de {label.toLowerCase()}</p>
                 </div>
               ) : (
-                <div className="grid grid-cols-4 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   {list.map((cat) => (
                     <div
                       key={cat.id}

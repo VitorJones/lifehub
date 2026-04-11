@@ -338,7 +338,7 @@ export default function DashboardPage() {
   const hojeDs = format(hoje, "yyyy-MM-dd");
 
   return (
-    <div className="p-8 space-y-6">
+    <div className="p-4 md:p-8 space-y-4 md:space-y-6">
 
       {/* ── Saudação ──────────────────────────────────────────────────────── */}
       <div>
@@ -359,7 +359,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── 3 cards resumo ──────────────────────────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
 
         {/* Saldo do mês */}
         <Card href="/financeiro">
@@ -375,7 +375,7 @@ export default function DashboardPage() {
           {loading ? (
             <div className="h-7 w-32 bg-[#1a1a1f] rounded animate-pulse" />
           ) : (
-            <p className={`text-2xl font-mono font-semibold ${
+            <p className={`text-lg md:text-2xl font-mono font-semibold truncate ${
               (data?.financeiro.saldo ?? 0) >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"
             }`}>
               {moeda(data?.financeiro.saldo ?? 0)}
@@ -403,7 +403,7 @@ export default function DashboardPage() {
           {loading ? (
             <div className="h-7 w-16 bg-[#1a1a1f] rounded animate-pulse" />
           ) : (
-            <p className="text-2xl font-heading font-semibold text-[#f5f5f5]">
+            <p className="text-xl md:text-2xl font-heading font-semibold text-[#f5f5f5]">
               {data?.habitos.total
                 ? `${Math.round((data.habitos.concluidos / data.habitos.total) * 100)}%`
                 : "—"}
@@ -441,7 +441,7 @@ export default function DashboardPage() {
           {loading ? (
             <div className="h-7 w-10 bg-[#1a1a1f] rounded animate-pulse" />
           ) : (
-            <p className="text-2xl font-heading font-semibold text-[#f5f5f5]">
+            <p className="text-xl md:text-2xl font-heading font-semibold text-[#f5f5f5]">
               {data?.tarefas.pendentes ?? 0}
             </p>
           )}
@@ -456,7 +456,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Gráfico de barras + Widget Água ───────────────────────────── */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div className="col-span-2">
       <Card>
         <div className="flex items-center justify-between mb-5">

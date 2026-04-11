@@ -196,9 +196,9 @@ export default function TransacoesPage() {
   const datasOrdenadas = Object.keys(porData).sort((a, b) => b.localeCompare(a));
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Controles */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
         <div className="flex items-center gap-3">
           <button
             onClick={() => navegarMes(-1)}
@@ -217,7 +217,7 @@ export default function TransacoesPage() {
           </button>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Busca */}
           <div className="relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#52525b]" />
@@ -225,7 +225,7 @@ export default function TransacoesPage() {
               placeholder="Buscar transação..."
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              className="pl-9 w-52 bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] placeholder:text-[#52525b] focus-visible:ring-[#f97316]/50"
+              className="pl-9 w-44 sm:w-52 bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] placeholder:text-[#52525b] focus-visible:ring-[#f97316]/50"
             />
           </div>
 
@@ -265,7 +265,7 @@ export default function TransacoesPage() {
       </div>
 
       {/* Mini totais */}
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-wrap gap-2 md:gap-4 mb-6">
         <div className="flex items-center gap-2 bg-[#22c55e]/10 border border-[#22c55e]/20 rounded-lg px-4 py-2">
           <TrendingUp size={14} className="text-[#22c55e]" />
           <span className="text-xs text-[#a1a1aa]">Receitas:</span>

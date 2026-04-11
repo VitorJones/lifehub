@@ -351,7 +351,7 @@ function TarefaCard({
       <button
         onClick={(e) => { e.stopPropagation(); onToggleConcluida(); }}
         className={`
-          mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0
+          mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0
           transition-all duration-200
           ${concluida
             ? "border-[#22c55e] bg-[#22c55e]"
@@ -386,7 +386,7 @@ function TarefaCard({
 
       {/* Indicador de status */}
       <div
-        className="w-1.5 h-1.5 rounded-full mt-1.5 flex-shrink-0"
+        className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0"
         style={{ background: corStatus(tarefa.status) }}
       />
     </div>
@@ -422,7 +422,7 @@ function KanbanCard({
         <button
           onClick={(e) => { e.stopPropagation(); onToggleConcluida(); }}
           className={`
-            mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0
+            mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0
             transition-all duration-200
             ${concluida ? "border-[#22c55e] bg-[#22c55e]" : "border-[#3f3f46] hover:border-[#f97316]"}
           `}
@@ -432,7 +432,7 @@ function KanbanCard({
         <p className={`text-sm font-medium leading-snug flex-1 min-w-0 ${concluida ? "line-through text-[#52525b]" : "text-[#f5f5f5]"}`}>
           {tarefa.titulo}
         </p>
-        <GripVertical size={13} className="text-[#3f3f46] flex-shrink-0 mt-0.5" />
+        <GripVertical size={13} className="text-[#3f3f46] shrink-0 mt-0.5" />
       </div>
 
       {tarefa.descricao && !concluida && (
@@ -582,10 +582,10 @@ export default function TarefasPage() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
 
       {/* ── Header ─────────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-heading font-semibold text-[#f5f5f5]">Tarefas</h1>
           <p className="text-sm text-[#a1a1aa] mt-0.5">
@@ -624,7 +624,7 @@ export default function TarefasPage() {
       </div>
 
       {/* ── Cards resumo ───────────────────────────────────────────────── */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         {[
           { label: "Total",        valor: total,                   cor: "#a1a1aa" },
           { label: "Em andamento", valor: porStatus.em_andamento?.length ?? 0, cor: "#f97316" },
@@ -633,7 +633,7 @@ export default function TarefasPage() {
         ].map(({ label, valor, cor }) => (
           <div key={label} className="bg-[#111113] border border-[#27272a] rounded-xl p-4">
             <p className="text-xs text-[#52525b] mb-1">{label}</p>
-            <p className="text-2xl font-heading font-semibold" style={{ color: cor }}>{valor}</p>
+            <p className="text-xl md:text-2xl font-heading font-semibold" style={{ color: cor }}>{valor}</p>
           </div>
         ))}
       </div>
@@ -770,7 +770,7 @@ export default function TarefasPage() {
       ) : (
 
         /* ── Vista Kanban ────────────────────────────────────────────── */
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {COLUNAS_KANBAN.map(({ status, label, cor }) => {
             const grupo = porStatus[status] ?? [];
             return (

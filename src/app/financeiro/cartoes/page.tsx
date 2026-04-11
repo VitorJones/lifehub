@@ -170,10 +170,10 @@ export default function CartoesPage() {
   const totalGasto = cartoes.reduce((a, c) => a + c.gastoMes, 0);
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
         {/* Resumo geral */}
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-2">
           <div className="bg-[#111113] border border-[#27272a] rounded-xl px-5 py-3">
             <p className="text-xs text-[#a1a1aa] mb-0.5">Limite total</p>
             <p className="text-lg font-mono font-semibold text-[#f5f5f5]">{formatarMoeda(totalLimite)}</p>
@@ -193,7 +193,7 @@ export default function CartoesPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {[0, 1, 2].map((i) => <div key={i} className="h-80 bg-[#111113] border border-[#27272a] rounded-2xl animate-pulse" />)}
         </div>
       ) : cartoes.length === 0 ? (
@@ -206,7 +206,7 @@ export default function CartoesPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {cartoes.map((cartao) => (
             <div key={cartao.id} className="group relative">
               <CartaoVisual cartao={cartao} />

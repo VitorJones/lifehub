@@ -119,7 +119,7 @@ export default function ContasPage() {
   const saldoTotal = contas.reduce((a, c) => a + c.saldo, 0);
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       <div className="flex items-center justify-between mb-6">
         <div className="bg-[#111113] border border-[#27272a] rounded-xl px-5 py-3">
           <p className="text-xs text-[#a1a1aa] mb-0.5">Saldo Total das Contas</p>
@@ -137,7 +137,7 @@ export default function ContasPage() {
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-36 bg-[#111113] border border-[#27272a] rounded-xl animate-pulse" />
           ))}
@@ -158,7 +158,7 @@ export default function ContasPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           {contas.map((conta) => {
             const tipoInfo = TIPOS_CONTA.find((t) => t.value === conta.tipo);
             return (
@@ -188,7 +188,7 @@ export default function ContasPage() {
                 <p className="text-xs text-[#52525b] mb-3">{tipoInfo?.label ?? conta.tipo}</p>
 
                 <p
-                  className={`text-xl font-mono font-semibold ${
+                  className={`text-base md:text-xl font-mono font-semibold truncate ${
                     conta.saldo >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"
                   }`}
                 >

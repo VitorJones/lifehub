@@ -340,7 +340,7 @@ function HojeView({
               >
                 {/* Checkbox visual */}
                 <div className={`
-                  w-6 h-6 rounded-full border-2 flex items-center justify-center flex-shrink-0
+                  w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0
                   transition-all duration-200
                   ${concluido ? "border-[#a855f7] bg-[#a855f7]" : "border-[#3f3f46]"}
                 `}>
@@ -349,7 +349,7 @@ function HojeView({
 
                 {/* Ícone */}
                 <div
-                  className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0"
                   style={{ background: `${h.cor}20` }}
                 >
                   <Icone size={16} style={{ color: h.cor }} />
@@ -367,21 +367,21 @@ function HojeView({
 
                 {/* Streak */}
                 {streak > 0 && (
-                  <div className="flex items-center gap-1 text-[#f97316] flex-shrink-0">
+                  <div className="flex items-center gap-1 text-[#f97316] shrink-0">
                     <Flame size={14} />
                     <span className="text-sm font-medium font-mono">{streak}</span>
                   </div>
                 )}
 
                 {/* Badge frequência */}
-                <span className="text-[10px] text-[#52525b] border border-[#27272a] rounded-full px-2 py-0.5 flex-shrink-0">
+                <span className="text-[10px] text-[#52525b] border border-[#27272a] rounded-full px-2 py-0.5 shrink-0">
                   {h.frequencia === "diario" ? "Diário" : "Personalizado"}
                 </span>
 
                 {/* Excluir */}
                 <button
                   onClick={(e) => { e.stopPropagation(); onExcluir(h.id); }}
-                  className="w-7 h-7 flex items-center justify-center text-[#52525b] hover:text-[#ef4444] transition-colors flex-shrink-0"
+                  className="w-7 h-7 flex items-center justify-center text-[#52525b] hover:text-[#ef4444] transition-colors shrink-0"
                 >
                   <Trash2 size={14} />
                 </button>
@@ -441,14 +441,14 @@ function MesView({
         <div className="bg-[#111113] border border-[#27272a] rounded-xl p-5 overflow-x-auto">
           {/* Cabeçalho de dias */}
           <div className="flex items-center mb-3">
-            <div className="w-44 flex-shrink-0" />
+            <div className="w-44 shrink-0" />
             <div className="flex gap-1">
               {dias.map((d) => {
                 const diaDate = new Date(ano, mes - 1, d);
                 const diaSem = DIAS_SEMANA_NOMES[getDay(diaDate)];
                 const isHoje = dataStr(diaDate) === dataStr(hoje);
                 return (
-                  <div key={d} className="w-7 text-center flex-shrink-0">
+                  <div key={d} className="w-7 text-center shrink-0">
                     <p className="text-[9px] text-[#52525b]">{diaSem}</p>
                     <p className={`text-[10px] font-medium ${isHoje ? "text-[#a855f7]" : "text-[#a1a1aa]"}`}>
                       {d}
@@ -465,8 +465,8 @@ function MesView({
               const Icone = getIcone(h.icone);
               return (
                 <div key={h.id} className="flex items-center">
-                  <div className="w-44 flex items-center gap-2 flex-shrink-0 pr-3">
-                    <div className="w-5 h-5 rounded flex items-center justify-center flex-shrink-0" style={{ background: `${h.cor}20` }}>
+                  <div className="w-44 flex items-center gap-2 shrink-0 pr-3">
+                    <div className="w-5 h-5 rounded flex items-center justify-center shrink-0" style={{ background: `${h.cor}20` }}>
                       <Icone size={12} style={{ color: h.cor }} />
                     </div>
                     <span className="text-xs text-[#f5f5f5] truncate">{h.nome}</span>
@@ -484,7 +484,7 @@ function MesView({
                         <div
                           key={d}
                           onClick={() => clicavel && onToggle(h.id, !concluido, ds)}
-                          className={`w-7 h-7 rounded-md flex-shrink-0 transition-all ${clicavel ? "cursor-pointer hover:opacity-80" : ""}`}
+                          className={`w-7 h-7 rounded-md shrink-0 transition-all ${clicavel ? "cursor-pointer hover:opacity-80" : ""}`}
                           style={{
                             background: !aplicavel
                               ? "transparent"
@@ -583,7 +583,7 @@ function DashboardView({ habitos }: { habitos: HabitoComRegistros[] }) {
   return (
     <div>
       {/* Cards de stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mb-6">
         {[
           { label: "Streak atual",   valor: `${streakAtual}d`,     cor: "#f97316", icon: Flame },
           { label: "Melhor streak",  valor: `${melhorStreak}d`,    cor: "#eab308", icon: Trophy },
@@ -592,13 +592,13 @@ function DashboardView({ habitos }: { habitos: HabitoComRegistros[] }) {
         ].map((s) => {
           const Icon = s.icon;
           return (
-            <div key={s.label} className="bg-[#111113] border border-[#27272a] rounded-xl p-4 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: `${s.cor}20` }}>
-                <Icon size={16} style={{ color: s.cor }} />
+            <div key={s.label} className="bg-[#111113] border border-[#27272a] rounded-xl p-3 md:p-4 flex items-center gap-2 md:gap-3">
+              <div className="w-8 h-8 md:w-9 md:h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: `${s.cor}20` }}>
+                <Icon size={15} style={{ color: s.cor }} />
               </div>
-              <div>
-                <p className="text-xs text-[#52525b]">{s.label}</p>
-                <p className="text-xl font-mono font-semibold text-[#f5f5f5]">{s.valor}</p>
+              <div className="min-w-0">
+                <p className="text-[10px] md:text-xs text-[#52525b] truncate">{s.label}</p>
+                <p className="text-base md:text-xl font-mono font-semibold text-[#f5f5f5]">{s.valor}</p>
               </div>
             </div>
           );

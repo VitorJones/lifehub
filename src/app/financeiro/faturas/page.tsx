@@ -112,9 +112,9 @@ export default function FaturasPage() {
   };
 
   return (
-    <div className="p-8">
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex gap-3 text-sm">
+    <div className="p-4 md:p-8">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+        <div className="flex flex-wrap gap-2 text-sm">
           {(["aberta", "fechada", "paga"] as const).map((s) => {
             const cfg = STATUS_CONFIG[s];
             const Icon = cfg.icon;
@@ -170,7 +170,7 @@ export default function FaturasPage() {
                     return (
                       <div key={fatura.id} className="bg-[#111113] border border-[#27272a] rounded-xl px-5 py-4 hover:border-[#3f3f46] transition-all duration-200 flex items-center gap-4">
                         {/* Status icon */}
-                        <StatusIcon size={18} style={{ color: cfg.cor }} className="flex-shrink-0" />
+                        <StatusIcon size={18} style={{ color: cfg.cor }} className="shrink-0" />
 
                         {/* Mês */}
                         <div className="flex-1 min-w-0">
@@ -192,7 +192,7 @@ export default function FaturasPage() {
                         </div>
 
                         {/* Ações de status */}
-                        <div className="flex items-center gap-2 flex-shrink-0">
+                        <div className="flex items-center gap-2 shrink-0">
                           {fatura.status === "aberta" && (
                             <button
                               onClick={() => atualizarStatus(fatura, "fechada")}

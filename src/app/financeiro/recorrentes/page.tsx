@@ -167,10 +167,10 @@ export default function RecorrentesPage() {
   const receitas = recorrentes.filter((t) => t.tipo === "receita");
 
   return (
-    <div className="p-8">
+    <div className="p-4 md:p-8">
       {/* Header com totais */}
-      <div className="flex items-start justify-between mb-6">
-        <div className="flex gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-6">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <div className="bg-[#111113] border border-[#27272a] rounded-xl px-5 py-3">
             <p className="text-xs text-[#a1a1aa] mb-0.5">Compromisso mensal</p>
             <p className={`text-xl font-mono font-semibold ${totalRecorrentes >= 0 ? "text-[#22c55e]" : "text-[#ef4444]"}`}>
@@ -224,7 +224,7 @@ export default function RecorrentesPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
           {/* Despesas fixas */}
           <div>
             <div className="flex items-center gap-3 mb-3">
@@ -433,7 +433,7 @@ function RecorrenteCard({
     <div className="bg-[#111113] border border-[#27272a] rounded-xl px-4 py-3.5 hover:border-[#3f3f46] transition-all duration-200 group flex items-center gap-3">
       {/* Indicador de cor */}
       <div
-        className="w-1 h-10 rounded-full flex-shrink-0"
+        className="w-1 h-10 rounded-full shrink-0"
         style={{ background: t.categoria.cor }}
       />
 
@@ -455,7 +455,7 @@ function RecorrenteCard({
 
       {/* Valor */}
       <span
-        className={`font-mono font-semibold text-sm flex-shrink-0 ${
+        className={`font-mono font-semibold text-sm shrink-0 ${
           t.tipo === "receita" ? "text-[#22c55e]" : "text-[#f5f5f5]"
         }`}
       >
@@ -463,7 +463,7 @@ function RecorrenteCard({
       </span>
 
       {/* Ações */}
-      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
         <button
           onClick={onEditar}
           className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-[#222228] text-[#a1a1aa] hover:text-[#f5f5f5] transition-colors"
