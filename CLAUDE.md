@@ -19,6 +19,7 @@ App web pessoal de gestão de vida inspirado no **Sistema Forja** (produtividade
 - **Ícones:** Lucide React
 - **Estado:** React hooks (useState, useReducer, useContext)
 - **Datas:** date-fns com locale pt-BR
+- **Autenticação:** NextAuth.js (Auth.js) v5 + Credentials provider + bcrypt
 - **Deploy:** Vercel + Turso
 
 ---
@@ -112,6 +113,28 @@ Sidebar fixa à esquerda com 6 abas:
 ## Schema do Banco de Dados (Prisma)
 
 ```prisma
+// ==========================================
+// AUTENTICAÇÃO
+// ==========================================
+
+model User {
+  id            String   @id @default(cuid())
+  nome          String
+  email         String   @unique
+  senhaHash     String   // hash bcrypt da senha
+  avatarUrl     String?  // URL ou iniciais geradas
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  createdAt    DateTime @default(now())
+}
+
 // ==========================================
 // FINANCEIRO
 // ==========================================
@@ -425,6 +448,92 @@ model Amigo {
 ---
 
 ## Módulos — Detalhamento
+
+### 0. Autenticação (`/login` e `/registro`)
+
+O app usa **NextAuth.js v5** com Credentials provider (email + senha). Todas as rotas são protegidas — redireciona pra `/login` se não autenticado.
+
+---
+
+#### Página de Login (`/login`)
+
+**Layout:** centralizado na tela, card escuro com fundo dark
+
+**Campos:**
+- Email * (input type="email")
+- Senha * (input type="password", com toggle mostrar/ocultar)
+- Botão "Entrar" (vermelho/laranja)
+- Link "Não tem conta? Criar conta" → `/registro`
+
+**Validações:**
+- Email formato válido
+- Senha mínimo 6 caracteres
+- Mensagem de erro: "Email ou senha inválidos" (genérica por segurança)
+
+---
+
+#### Página de Registro (`/registro`)
+
+**Layout:** mesmo estilo do login
+
+**Campos:**
+- Nome * (input texto)
+- Email * (input type="email")
+- Senha * (input type="password", mín. 6 caracteres)
+- Confirmar senha *
+- Botão "Criar conta" (vermelho/laranja)
+- Link "Já tem conta? Entrar" → `/login`
+
+**Validações:**
+- Nome obrigatório
+- Email formato válido + verificar se já existe no banco
+- Senhas coincidem
+- Senha mínimo 6 caracteres
+
+**Ao criar conta:**
+- Senha é hasheada com bcrypt (salt rounds: 10)
+- Usuário é criado na tabela `User`
+- Redireciona pro login com mensagem "Conta criada com sucesso"
+
+---
+
+#### Configuração técnica
+
+**Dependências:**
+```bash
+npm install next-auth@beta bcryptjs
+npm install -D @types/bcryptjs
+```
+
+**Arquivo `auth.ts` (raiz do projeto):**
+- Configura NextAuth com Credentials provider
+- Callback `authorize`: busca usuário por email, compara senha com `bcrypt.compare`
+- JWT strategy (stateless, sem tabela de session necessária em runtime)
+- Session callback inclui `user.id` e `user.nome`
+
+**Middleware `middleware.ts` (raiz do projeto):**
+- Protege todas as rotas exceto `/login`, `/registro`, `/api/auth/*`
+- Redireciona para `/login` se não autenticado
+- Rota `/` (dashboard) é protegida
+
+**Componente de logout:**
+- No rodapé da sidebar: botão "Sair" ao lado de Configurações
+- Ou no menu do usuário: nome + avatar + botão sair
+
+**API Routes:**
+| Rota | Método | Descrição |
+|------|--------|-----------|
+| `/api/auth/[...nextauth]` | GET/POST | Handled by NextAuth |
+| `/api/registro` | POST | Criar novo usuário (hash senha + salvar no banco) |
+
+---
+
+#### Fluxo do usuário
+
+1. Acessa o app → middleware verifica sessão → redireciona pra `/login`
+2. Faz login com email/senha → NextAuth valida → cria JWT → redireciona pro dashboard
+3. Sessão persiste no cookie → não precisa logar de novo ao reabrir
+4. Botão "Sair" → destroi sessão → redireciona pro `/login`
 
 ### 1. Dashboard (`/`)
 
@@ -1291,6 +1400,10 @@ src/
 ├── app/
 │   ├── layout.tsx              # Layout raiz com sidebar
 │   ├── page.tsx                # Dashboard
+│   ├── login/
+│   │   └── page.tsx            # Página de login
+│   ├── registro/
+│   │   └── page.tsx            # Página de registro
 │   ├── financeiro/
 │   │   ├── layout.tsx          # Layout com sub-abas (tab bar horizontal)
 │   │   ├── page.tsx            # Visão Geral (rota padrão)
@@ -1349,6 +1462,8 @@ src/
 │       ├── tarefas/
 │       ├── amigos/
 │       ├── agua/
+│       ├── auth/               # NextAuth routes
+│       ├── registro/           # POST criar usuário
 │       └── dashboard/
 ├── components/
 │   ├── ui/                     # shadcn/ui components
@@ -1416,6 +1531,8 @@ src/
 │   └── formatters.ts           # Formatação de moeda, data, etc.
 ├── hooks/
 │   └── use-*.ts                # Custom hooks
+├── auth.ts                     # Configuração NextAuth (Credentials provider)
+├── middleware.ts                # Protege rotas (redireciona pra /login)
 └── prisma/
     ├── schema.prisma
     └── seed.ts                 # Dados de exemplo
@@ -1429,6 +1546,9 @@ Todas as rotas seguem padrão REST:
 
 | Recurso | GET | POST | PUT | DELETE |
 |---------|-----|------|-----|--------|
+| **Autenticação** | | | | |
+| `/api/auth/[...nextauth]` | NextAuth handlers | NextAuth handlers | — | — |
+| `/api/registro` | — | Criar usuário (hash senha + salvar) | — | — |
 | **Financeiro** | | | | |
 | `/api/transacoes` | Lista (com filtros: tipo, categoria, conta, período) | Criar | — | — |
 | `/api/transacoes/[id]` | Detalhe | — | Atualizar | Remover |
@@ -1514,14 +1634,17 @@ Todas as rotas seguem padrão REST:
 8. **Tarefas**: Schema + visualizações (Hoje/Semana/Mês/Atrasadas) + drag-and-drop
 9. **Amigos**: Schema + grid de cards + detalhe com notas + integração automática com Aniversários da Agenda
 10. **Dashboard**: Agregação de dados de todos os módulos + gráficos + tracker de água
-11. **Deploy**: Migrar banco para Turso + deploy na Vercel
-12. **Polish**: Animações, micro-interações, responsividade, seed com dados de exemplo
+11. **Autenticação**: NextAuth + login/registro + middleware de proteção + hash de senhas
+12. **Deploy**: Migrar banco para Turso + deploy na Vercel + push schema com tabelas de auth
+13. **Polish**: Animações, micro-interações, responsividade, seed com dados de exemplo
 
 ---
 
 ## Notas Importantes
 
-- O app é **pessoal** (single-user), sem necessidade de autenticação
+- Autenticação com email/senha via NextAuth.js v5 (Credentials provider)
+- Todas as rotas protegidas por middleware (exceto /login e /registro)
+- Senhas hasheadas com bcrypt (nunca armazenadas em texto puro)
 - Desenvolvimento local usa SQLite (arquivo local, zero config)
 - Produção usa Turso (SQLite na nuvem, plano free)
 - Priorizar **funcionalidade primeiro**, polish visual depois

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import {
   LayoutDashboard,
   Wallet,
@@ -14,6 +15,7 @@ import {
   Users,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
 
 const navItems = [
@@ -121,7 +123,7 @@ export function Sidebar() {
         </nav>
 
         {/* Rodapé */}
-        <div className="border-t border-[#27272a] p-3">
+        <div className="border-t border-[#27272a] p-3 space-y-1">
           <Link
             href="/configuracoes"
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#a1a1aa] hover:bg-[#1a1a1f] hover:text-[#f5f5f5] transition-all duration-200"
@@ -129,6 +131,13 @@ export function Sidebar() {
             <Settings size={20} className="text-[#52525b]" />
             Configurações
           </Link>
+          <button
+            onClick={() => signOut({ callbackUrl: "/login" })}
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-[#a1a1aa] hover:bg-[#ef4444]/10 hover:text-[#ef4444] transition-all duration-200"
+          >
+            <LogOut size={20} className="text-[#52525b]" />
+            Sair
+          </button>
         </div>
       </aside>
     </>
