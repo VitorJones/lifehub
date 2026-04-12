@@ -654,7 +654,7 @@ export default function AgendaPage() {
   const salvarEvento = async (form: typeof FORM_VAZIO) => {
     const buildDt = (date: string, time: string) =>
       form.diaInteiro || form.tipo === "aniversario"
-        ? `${date}T00:00:00`
+        ? `${date}T12:00:00`
         : `${date}T${time}:00`;
 
     const body = {
