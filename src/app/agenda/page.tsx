@@ -652,10 +652,14 @@ export default function AgendaPage() {
   };
 
   const salvarEvento = async (form: typeof FORM_VAZIO) => {
-    const buildDt = (date: string, time: string) =>
-      form.diaInteiro || form.tipo === "aniversario"
-        ? `${date}T12:00:00`
-        : `${date}T${time}:00`;
+    const buildDt = (date: string, time: string): string => {
+      if (form.diaInteiro || form.tipo === "aniversario") {
+        return `${date}T12:00:00`;
+      }
+      // new Date sem TZ é interpretado como hora local pelo browser,
+      // toISOString() converte para UTC — evita shift de fuso horário
+      return new Date(`${date}T${time}:00`).toISOString();
+    };
 
     const body = {
       titulo:          form.titulo,
@@ -693,7 +697,7 @@ export default function AgendaPage() {
       <div className="hidden md:flex flex-1 flex-col p-6 gap-4 min-w-0 overflow-hidden">
 
         {/* Header */}
-        <div className="flex items-center justify-between flex-shrink-0">
+        <div className="flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <button
               onClick={() => navegarMes(-1)}
@@ -729,7 +733,7 @@ export default function AgendaPage() {
         <div className="flex-1 flex flex-col bg-[#111113] border border-[#27272a] rounded-xl overflow-hidden min-h-0">
 
           {/* Cabeçalho dias da semana */}
-          <div className="grid grid-cols-7 border-b border-[#27272a] flex-shrink-0">
+          <div className="grid grid-cols-7 border-b border-[#27272a] shrink-0">
             {DIAS_SEMANA.map((d) => (
               <div key={d} className="py-2.5 text-center text-[11px] font-medium text-[#52525b] uppercase tracking-wider">
                 {d}
@@ -791,11 +795,11 @@ export default function AgendaPage() {
                           }}
                         >
                           {e.tipo === "aniversario" ? (
-                            <span className="flex-shrink-0 text-[9px]">🎂</span>
+                            <span className="shrink-0 text-[9px]">🎂</span>
                           ) : e.diaInteiro ? (
-                            <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: e.cor }} />
+                            <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: e.cor }} />
                           ) : (
-                            <span className="font-mono flex-shrink-0 text-[9px]">
+                            <span className="font-mono shrink-0 text-[9px]">
                               {formatarHora(e.dataInicio)}
                             </span>
                           )}
@@ -821,7 +825,7 @@ export default function AgendaPage() {
         <div className="p-4 md:p-5 border-b border-[#27272a] shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <p className="text-[10px] text-[#52525b] uppercase tracking-wide mb-0.5 capitalize">
+              <p className="text-[10px] text-[#52525b] uppercase tracking-wide mb-0.5">
                 {diaSel === hojeDs
                   ? "Hoje"
                   : format(new Date(diaSel + "T12:00:00"), "EEEE", { locale: ptBR })}
@@ -852,12 +856,12 @@ export default function AgendaPage() {
                   className="flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer hover:bg-[#111113] transition-colors"
                 >
                   <div
-                    className="w-2 h-2 rounded-full mt-1.5 flex-shrink-0"
+                    className="w-2 h-2 rounded-full mt-1.5 shrink-0"
                     style={{ background: e.cor }}
                   />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1">
-                      {e.tipo === "aniversario" && <Cake size={11} className="text-[#ec4899] flex-shrink-0" />}
+                      {e.tipo === "aniversario" && <Cake size={11} className="text-[#ec4899] shrink-0" />}
                       <p className="text-sm font-medium text-[#f5f5f5] truncate">{e.titulo}</p>
                     </div>
                     {e.tipo === "aniversario" ? (
@@ -880,7 +884,7 @@ export default function AgendaPage() {
                     )}
                     {e.local && (
                       <p className="text-[11px] text-[#a1a1aa] flex items-center gap-1 truncate mt-0.5">
-                        <MapPin size={10} className="flex-shrink-0" />
+                        <MapPin size={10} className="shrink-0" />
                         {e.local}
                       </p>
                     )}
@@ -918,15 +922,15 @@ export default function AgendaPage() {
                     className="flex items-center gap-2 px-2 py-1.5 rounded-lg cursor-pointer hover:bg-[#111113] transition-colors"
                   >
                     {e.tipo === "aniversario"
-                      ? <Cake size={12} className="text-[#ec4899] flex-shrink-0" />
-                      : <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: e.cor }} />
+                      ? <Cake size={12} className="text-[#ec4899] shrink-0" />
+                      : <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: e.cor }} />
                     }
                     <div className="flex-1 min-w-0">
                       <p className="text-xs text-[#f5f5f5] truncate">{e.titulo}</p>
                       <p className="text-[10px] text-[#52525b] capitalize">{label}</p>
                     </div>
                     {!e.diaInteiro && e.tipo !== "aniversario" && (
-                      <span className="text-[10px] text-[#52525b] flex-shrink-0 font-mono">
+                      <span className="text-[10px] text-[#52525b] shrink-0 font-mono">
                         {formatarHora(e.dataInicio)}
                       </span>
                     )}
