@@ -40,97 +40,103 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const body = await request.json();
-  const {
-    descricao, valor, tipo, data,
-    categoriaId, contaId, cartaoId,
-    formaPagamento, recorrente, observacao,
-    parcelado, numParcelas,
-  } = body;
+  try {
+    const body = await request.json();
+    const {
+      descricao, valor, tipo, data,
+      categoriaId, contaId, cartaoId,
+      formaPagamento, recorrente, observacao,
+      parcelado, numParcelas,
+    } = body;
 
-  const v = Number(valor);
-  const dataBase = parseData(data);
-  const fpago = formaPagamento ?? "dinheiro";
-  const cartIdFinal = (fpago === "credito" || fpago === "debito") && cartaoId ? cartaoId : null;
-  const contaIdFinal = contaId && contaId !== "__none__" ? contaId : null;
+    const v = Number(valor);
+    const dataBase = parseData(data);
+    const fpago = formaPagamento ?? "dinheiro";
+    const cartIdFinal = (fpago === "credito" || fpago === "debito") && cartaoId && cartaoId !== "__none__" ? cartaoId : null;
+    const contaIdFinal = contaId && contaId !== "__none__" ? contaId : null;
 
-  // ── Parcelamento ────────────────────────────────────────────────────────────
-  if (parcelado && numParcelas && Number(numParcelas) > 1) {
-    const np = Number(numParcelas);
-    const valorParcela = Math.round((v / np) * 100) / 100;
+    // ── Parcelamento ────────────────────────────────────────────────────────────
+    if (parcelado && numParcelas && Number(numParcelas) > 1) {
+      const np = Number(numParcelas);
+      const valorParcela = Math.round((v / np) * 100) / 100;
 
-    const parcelamento = await prisma.parcelamento.create({
-      data: {
-        descricao,
-        valorTotal: v,
-        numParcelas: np,
-        valorParcela,
-        parcelaAtual: 1,
-        cartaoId: cartIdFinal,
-        categoriaId,
-        dataInicio: dataBase,
-      },
-    });
+      const parcelamento = await prisma.parcelamento.create({
+        data: {
+          descricao,
+          valorTotal: v,
+          numParcelas: np,
+          valorParcela,
+          parcelaAtual: 1,
+          cartaoId: cartIdFinal,
+          categoriaId,
+          dataInicio: dataBase,
+        },
+      });
 
-    for (let i = 0; i < np; i++) {
-      const dataParcela = addMonths(dataBase, i);
+      for (let i = 0; i < np; i++) {
+        const dataParcela = addMonths(dataBase, i);
 
-      // Cria/garante fatura do mês para o cartão (só crédito tem fatura)
-      if (cartIdFinal && fpago === "credito") {
-        const mesRef = format(dataParcela, "yyyy-MM");
-        await prisma.fatura.upsert({
-          where: { cartaoId_mesReferencia: { cartaoId: cartIdFinal, mesReferencia: mesRef } },
-          update: {},
-          create: { cartaoId: cartIdFinal, mesReferencia: mesRef, status: "aberta" },
+        // Cria/garante fatura do mês para o cartão (só crédito tem fatura)
+        if (cartIdFinal && fpago === "credito") {
+          const mesRef = format(dataParcela, "yyyy-MM");
+          await prisma.fatura.upsert({
+            where: { cartaoId_mesReferencia: { cartaoId: cartIdFinal, mesReferencia: mesRef } },
+            update: {},
+            create: { cartaoId: cartIdFinal, mesReferencia: mesRef, status: "aberta" },
+          });
+        }
+
+        await prisma.transacao.create({
+          data: {
+            descricao: `${descricao} (${i + 1}/${np})`,
+            valor: valorParcela,
+            tipo,
+            data: dataParcela,
+            categoriaId,
+            contaId: contaIdFinal,
+            cartaoId: cartIdFinal,
+            formaPagamento: fpago,
+            recorrente: false,
+            observacao: observacao || null,
+          },
         });
       }
 
-      await prisma.transacao.create({
-        data: {
-          descricao: `${descricao} (${i + 1}/${np})`,
-          valor: valorParcela,
-          tipo,
-          data: dataParcela,
-          categoriaId,
-          contaId: contaIdFinal,
-          cartaoId: cartIdFinal,
-          formaPagamento: fpago,
-          recorrente: false,
-          observacao: observacao || null,
-        },
+      return NextResponse.json({ parcelamentoId: parcelamento.id }, { status: 201 });
+    }
+
+    // ── Transação simples ────────────────────────────────────────────────────────
+    if (cartIdFinal && fpago === "credito") {
+      const mesRef = format(dataBase, "yyyy-MM");
+      await prisma.fatura.upsert({
+        where: { cartaoId_mesReferencia: { cartaoId: cartIdFinal, mesReferencia: mesRef } },
+        update: {},
+        create: { cartaoId: cartIdFinal, mesReferencia: mesRef, status: "aberta" },
       });
     }
 
-    return NextResponse.json({ parcelamentoId: parcelamento.id }, { status: 201 });
-  }
-
-  // ── Transação simples ────────────────────────────────────────────────────────
-  if (cartIdFinal && fpago === "credito") {
-    const mesRef = format(dataBase, "yyyy-MM");
-    await prisma.fatura.upsert({
-      where: { cartaoId_mesReferencia: { cartaoId: cartIdFinal, mesReferencia: mesRef } },
-      update: {},
-      create: { cartaoId: cartIdFinal, mesReferencia: mesRef, status: "aberta" },
+    const transacao = await prisma.transacao.create({
+      data: {
+        descricao,
+        valor: v,
+        tipo,
+        data: dataBase,
+        categoriaId,
+        contaId: contaIdFinal,
+        cartaoId: cartIdFinal,
+        formaPagamento: fpago,
+        recorrente: Boolean(recorrente),
+        observacao: observacao || null,
+      },
+      include: { categoria: true, conta: true, cartao: { select: { id: true, nome: true, cor: true } } },
     });
+
+    return NextResponse.json(transacao, { status: 201 });
+  } catch (err) {
+    console.error("[POST /api/transacoes]", err);
+    const msg = err instanceof Error ? err.message : "Erro interno";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
-
-  const transacao = await prisma.transacao.create({
-    data: {
-      descricao,
-      valor: v,
-      tipo,
-      data: dataBase,
-      categoriaId,
-      contaId: contaIdFinal,
-      cartaoId: cartIdFinal,
-      formaPagamento: fpago,
-      recorrente: Boolean(recorrente),
-      observacao: observacao || null,
-    },
-    include: { categoria: true, conta: true, cartao: { select: { id: true, nome: true, cor: true } } },
-  });
-
-  return NextResponse.json(transacao, { status: 201 });
 }
 
 export async function DELETE(request: Request) {

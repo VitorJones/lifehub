@@ -40,7 +40,7 @@ export async function PUT(
       data: dataParseada,
       categoriaId,
       contaId: contaId && contaId !== "__none__" ? contaId : null,
-      cartaoId: (formaPagamento === "credito" || formaPagamento === "debito") && cartaoId ? cartaoId : null,
+      cartaoId: (formaPagamento === "credito" || formaPagamento === "debito") && cartaoId && cartaoId !== "__none__" ? cartaoId : null,
       formaPagamento: formaPagamento ?? "dinheiro",
       recorrente: Boolean(recorrente),
       observacao: observacao || null,

@@ -161,20 +161,26 @@ export default function TransacoesPage() {
         ...form,
         valor: parseFloat(form.valor.replace(",", ".")),
         contaId: form.contaId && form.contaId !== "__none__" ? form.contaId : null,
-        cartaoId: form.formaPagamento === "credito" && form.cartaoId ? form.cartaoId : null,
+        cartaoId: (form.formaPagamento === "credito" || form.formaPagamento === "debito") && form.cartaoId ? form.cartaoId : null,
       };
+      let res: Response;
       if (editando) {
-        await fetch(`/api/transacoes/${editando.id}`, {
+        res = await fetch(`/api/transacoes/${editando.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
       } else {
-        await fetch("/api/transacoes", {
+        res = await fetch("/api/transacoes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        alert(`Erro ao salvar: ${err?.error ?? res.statusText}`);
+        return;
       }
       setModalAberto(false);
       carregar();
