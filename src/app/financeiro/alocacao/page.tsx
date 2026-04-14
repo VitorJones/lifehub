@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { PiggyBank, Plus, Pencil, Trash2 } from "lucide-react";
+import { PiggyBank, Plus, Pencil, Trash2, Check, X } from "lucide-react";
 import { formatarMoeda } from "@/lib/formatters";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -13,12 +13,13 @@ interface Alocacao {
   nome: string;
   percentual: number | null;
   valorFixo: number | null;
+  valorGuardado: number;
   cor: string;
 }
 
 const CORES_PADRAO = ["#3b82f6", "#a855f7", "#f97316", "#22c55e", "#ef4444", "#eab308", "#06b6d4", "#ec4899"];
 
-const FORM_VAZIO = { nome: "", percentual: "", valorFixo: "", cor: "#3b82f6", modo: "percentual" as "percentual" | "fixo" };
+const FORM_VAZIO = { nome: "", percentual: "", valorFixo: "", valorGuardado: "", cor: "#3b82f6", modo: "percentual" as "percentual" | "fixo" };
 
 export default function AlocacaoPage() {
   const [alocacoes, setAlocacoes] = useState<Alocacao[]>([]);
@@ -28,6 +29,7 @@ export default function AlocacaoPage() {
   const [editando, setEditando] = useState<Alocacao | null>(null);
   const [salvando, setSalvando] = useState(false);
   const [form, setForm] = useState(FORM_VAZIO);
+  const [guardando, setGuardando] = useState<{ id: string; valor: string } | null>(null);
 
   const carregar = useCallback(async () => {
     setLoading(true);
@@ -53,6 +55,7 @@ export default function AlocacaoPage() {
         nome: a.nome,
         percentual: a.percentual?.toString() ?? "",
         valorFixo: a.valorFixo?.toString() ?? "",
+        valorGuardado: a.valorGuardado?.toString() ?? "0",
         cor: a.cor,
         modo: a.percentual !== null ? "percentual" : "fixo",
       });
@@ -71,6 +74,7 @@ export default function AlocacaoPage() {
         nome: form.nome,
         percentual: form.modo === "percentual" && form.percentual ? Number(form.percentual) : null,
         valorFixo: form.modo === "fixo" && form.valorFixo ? Number(form.valorFixo) : null,
+        valorGuardado: form.valorGuardado ? Number(form.valorGuardado) : 0,
         cor: form.cor,
       };
 
@@ -96,6 +100,17 @@ export default function AlocacaoPage() {
 
   const excluir = async (id: string) => {
     await fetch(`/api/alocacoes/${id}`, { method: "DELETE" });
+    carregar();
+  };
+
+  const guardarValor = async (id: string, incremento: number) => {
+    if (!incremento || incremento <= 0) return;
+    await fetch(`/api/alocacoes/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ incremento }),
+    });
+    setGuardando(null);
     carregar();
   };
 
@@ -170,46 +185,98 @@ export default function AlocacaoPage() {
                 </button>
               </div>
             ) : (
-              <div className="space-y-3">
-                {alocacoesComValor.map((a) => (
-                  <div key={a.id} className="flex items-center gap-3 group">
-                    <div className="w-3 h-3 rounded-full shrink-0" style={{ background: a.cor }} />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between mb-1">
-                        <span className="text-sm text-[#f5f5f5] font-medium">{a.nome}</span>
-                        <span className="text-sm font-mono text-[#a1a1aa]">{formatarMoeda(a.valorCalculado)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <div className="flex-1 h-1.5 bg-[#1a1a1f] rounded-full overflow-hidden">
-                          <div
-                            className="h-full rounded-full"
-                            style={{
-                              width: `${rendaMensal > 0 ? Math.min((a.valorCalculado / rendaMensal) * 100, 100) : 0}%`,
-                              background: a.cor,
-                            }}
-                          />
+              <div className="space-y-4">
+                {alocacoesComValor.map((a) => {
+                  const isMeta = a.valorFixo !== null && a.valorFixo > 0;
+                  const pct = isMeta
+                    ? Math.min((a.valorGuardado / a.valorFixo!) * 100, 100)
+                    : rendaMensal > 0 ? Math.min((a.valorCalculado / rendaMensal) * 100, 100) : 0;
+                  const isGuardando = guardando?.id === a.id;
+
+                  return (
+                    <div key={a.id} className="group">
+                      <div className="flex items-start gap-3">
+                        <div className="w-3 h-3 rounded-full shrink-0 mt-1" style={{ background: a.cor }} />
+                        <div className="flex-1 min-w-0">
+                          {/* Nome + valor */}
+                          <div className="flex items-center justify-between mb-1 gap-2">
+                            <span className="text-sm text-[#f5f5f5] font-medium truncate">{a.nome}</span>
+                            <span className="text-xs font-mono text-[#a1a1aa] shrink-0">
+                              {isMeta
+                                ? `${formatarMoeda(a.valorGuardado)} / ${formatarMoeda(a.valorFixo!)} — ${pct.toFixed(0)}%`
+                                : formatarMoeda(a.valorCalculado)
+                              }
+                            </span>
+                          </div>
+
+                          {/* Barra de progresso */}
+                          <div className="h-1.5 bg-[#1a1a1f] rounded-full overflow-hidden mb-2">
+                            <div
+                              className="h-full rounded-full transition-all duration-500"
+                              style={{ width: `${pct}%`, background: a.cor }}
+                            />
+                          </div>
+
+                          {/* Guardar valor (metas) */}
+                          {isMeta && (
+                            isGuardando ? (
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="number"
+                                  min="0"
+                                  step="0.01"
+                                  autoFocus
+                                  value={guardando.valor}
+                                  onChange={(e) => setGuardando({ ...guardando, valor: e.target.value })}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") guardarValor(a.id, parseFloat(guardando.valor));
+                                    if (e.key === "Escape") setGuardando(null);
+                                  }}
+                                  placeholder="Valor a guardar (R$)"
+                                  className="flex-1 h-7 px-2 text-xs bg-[#1a1a1f] border border-[#27272a] rounded-lg text-[#f5f5f5] placeholder:text-[#52525b] focus:outline-none focus:border-[#f97316]/60 font-mono"
+                                />
+                                <button
+                                  onClick={() => guardarValor(a.id, parseFloat(guardando.valor))}
+                                  className="w-7 h-7 rounded-lg bg-[#22c55e]/20 hover:bg-[#22c55e]/30 text-[#22c55e] flex items-center justify-center transition-colors"
+                                >
+                                  <Check size={13} />
+                                </button>
+                                <button
+                                  onClick={() => setGuardando(null)}
+                                  className="w-7 h-7 rounded-lg hover:bg-[#1a1a1f] text-[#52525b] flex items-center justify-center transition-colors"
+                                >
+                                  <X size={13} />
+                                </button>
+                              </div>
+                            ) : (
+                              <button
+                                onClick={() => setGuardando({ id: a.id, valor: "" })}
+                                className="text-xs text-[#f97316] hover:text-[#ea6c0a] transition-colors"
+                              >
+                                + Guardar valor
+                              </button>
+                            )
+                          )}
                         </div>
-                        <span className="text-xs text-[#52525b] shrink-0 w-10 text-right">
-                          {a.percentual !== null ? `${a.percentual}%` : `R$`}
-                        </span>
+
+                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                          <button
+                            onClick={() => abrirModal(a)}
+                            className="w-6 h-6 rounded flex items-center justify-center text-[#52525b] hover:text-[#a1a1aa] hover:bg-[#1a1a1f] transition-colors"
+                          >
+                            <Pencil size={12} />
+                          </button>
+                          <button
+                            onClick={() => excluir(a.id)}
+                            className="w-6 h-6 rounded flex items-center justify-center text-[#52525b] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+                          >
+                            <Trash2 size={12} />
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                      <button
-                        onClick={() => abrirModal(a)}
-                        className="w-6 h-6 rounded flex items-center justify-center text-[#52525b] hover:text-[#a1a1aa] hover:bg-[#1a1a1f] transition-colors"
-                      >
-                        <Pencil size={12} />
-                      </button>
-                      <button
-                        onClick={() => excluir(a.id)}
-                        className="w-6 h-6 rounded flex items-center justify-center text-[#52525b] hover:text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
-                      >
-                        <Trash2 size={12} />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 {restante > 0 && (
                   <div className="flex items-center gap-3 mt-2 pt-2 border-t border-[#27272a]">
@@ -323,15 +390,27 @@ export default function AlocacaoPage() {
                 )}
               </div>
             ) : (
-              <div>
-                <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Valor fixo (R$)</Label>
-                <Input
-                  type="number"
-                  value={form.valorFixo}
-                  onChange={(e) => setForm((f) => ({ ...f, valorFixo: e.target.value }))}
-                  placeholder="1000,00"
-                  className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] placeholder:text-[#52525b]"
-                />
+              <div className="space-y-3">
+                <div>
+                  <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Meta (R$)</Label>
+                  <Input
+                    type="number"
+                    value={form.valorFixo}
+                    onChange={(e) => setForm((f) => ({ ...f, valorFixo: e.target.value }))}
+                    placeholder="Ex: 3000,00"
+                    className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] placeholder:text-[#52525b]"
+                  />
+                </div>
+                <div>
+                  <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Guardado até agora (R$)</Label>
+                  <Input
+                    type="number"
+                    value={form.valorGuardado}
+                    onChange={(e) => setForm((f) => ({ ...f, valorGuardado: e.target.value }))}
+                    placeholder="0,00"
+                    className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] placeholder:text-[#52525b]"
+                  />
+                </div>
               </div>
             )}
 

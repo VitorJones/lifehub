@@ -83,13 +83,14 @@ model Parcelamento {
 }
 
 model Alocacao {
-  id         String   @id @default(cuid())
-  nome       String
-  percentual Float?
-  valorFixo  Float?
-  cor        String   @default("#3b82f6")
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id            String   @id @default(cuid())
+  nome          String
+  percentual    Float?
+  valorFixo     Float?
+  valorGuardado Float    @default(0)
+  cor           String   @default("#3b82f6")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Investimento {
@@ -132,21 +133,22 @@ model Categoria {
 }
 
 model Transacao {
-  id          String   @id @default(cuid())
-  descricao   String
-  valor       Float
-  tipo        String   // "receita" | "despesa"
-  data        DateTime
-  categoriaId String
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
-  contaId     String?
-  conta       Conta?    @relation(fields: [contaId], references: [id])
-  cartaoId    String?
-  cartao      Cartao?   @relation(fields: [cartaoId], references: [id])
-  recorrente  Boolean   @default(false)
-  observacao  String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String   @id @default(cuid())
+  descricao      String
+  valor          Float
+  tipo           String   // "receita" | "despesa"
+  data           DateTime
+  categoriaId    String
+  categoria      Categoria @relation(fields: [categoriaId], references: [id])
+  contaId        String?
+  conta          Conta?    @relation(fields: [contaId], references: [id])
+  cartaoId       String?
+  cartao         Cartao?   @relation(fields: [cartaoId], references: [id])
+  formaPagamento String?   // "dinheiro" | "debito" | "credito"
+  recorrente     Boolean   @default(false)
+  observacao     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 }
 
 // ==========================================

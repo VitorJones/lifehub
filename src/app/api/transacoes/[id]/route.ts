@@ -25,7 +25,11 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await request.json();
-  const { descricao, valor, tipo, data, categoriaId, contaId, recorrente, observacao } = body;
+  const { descricao, valor, tipo, data, categoriaId, contaId, cartaoId, formaPagamento, recorrente, observacao } = body;
+
+  const dataParseada = typeof data === "string" && data.length === 10
+    ? new Date(`${data}T12:00:00`)
+    : new Date(data);
 
   const transacao = await prisma.transacao.update({
     where: { id },
@@ -33,13 +37,15 @@ export async function PUT(
       descricao,
       valor: Number(valor),
       tipo,
-      data: new Date(data),
+      data: dataParseada,
       categoriaId,
-      contaId: contaId || null,
+      contaId: contaId && contaId !== "__none__" ? contaId : null,
+      cartaoId: (formaPagamento === "credito" || formaPagamento === "debito") && cartaoId ? cartaoId : null,
+      formaPagamento: formaPagamento ?? "dinheiro",
       recorrente: Boolean(recorrente),
       observacao: observacao || null,
     },
-    include: { categoria: true, conta: true },
+    include: { categoria: true, conta: true, cartao: { select: { id: true, nome: true, cor: true } } },
   });
 
   return NextResponse.json(transacao);
