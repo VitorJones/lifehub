@@ -20,7 +20,6 @@ import { formatarMoeda } from "@/lib/formatters";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 interface Categoria {
@@ -94,21 +93,28 @@ export default function TransacoesPage() {
 
   const carregar = useCallback(async () => {
     setLoading(true);
+    const safeJson = async (res: Response) => {
+      try { const d = await res.json(); return Array.isArray(d) ? d : []; } catch { return []; }
+    };
     try {
-      const params = new URLSearchParams({ mes: String(mes), ano: String(ano) });
-      if (filtroTipo) params.set("tipo", filtroTipo);
-      if (busca) params.set("busca", busca);
-      const [resT, resC, resCon, resCar] = await Promise.all([
-        fetch(`/api/transacoes?${params}`),
+      // Config data (categorias, contas, cartões) independente das transações
+      const [resC, resCon, resCar] = await Promise.all([
         fetch("/api/categorias"),
         fetch("/api/contas"),
         fetch("/api/cartoes"),
       ]);
-      const [ts, cats, cons, cars] = await Promise.all([resT.json(), resC.json(), resCon.json(), resCar.json()]);
-      setTransacoes(ts);
+      const [cats, cons, cars] = await Promise.all([safeJson(resC), safeJson(resCon), safeJson(resCar)]);
       setCategorias(cats);
       setContas(cons);
       setCartoes(cars);
+    } catch { /* silencioso — não impede as transações */ }
+    try {
+      const params = new URLSearchParams({ mes: String(mes), ano: String(ano) });
+      if (filtroTipo) params.set("tipo", filtroTipo);
+      if (busca) params.set("busca", busca);
+      const resT = await fetch(`/api/transacoes?${params}`);
+      const ts = await safeJson(resT);
+      setTransacoes(ts);
     } finally {
       setLoading(false);
     }
@@ -468,27 +474,20 @@ export default function TransacoesPage() {
             {/* Categoria */}
             <div>
               <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Categoria</Label>
-              {categoriasFiltradas.length === 0 ? (
-                <div className="h-9 flex items-center px-3 bg-[#1a1a1f] border border-[#27272a] rounded-lg text-xs text-[#52525b]">
-                  Nenhuma categoria de {form.tipo} cadastrada
-                </div>
-              ) : (
-                <Select value={form.categoriaId} onValueChange={(v) => setForm((f) => ({ ...f, categoriaId: v ?? "" }))}>
-                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50 w-full">
-                    <SelectValue placeholder="Selecionar categoria..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
-                    {categoriasFiltradas.map((c) => (
-                      <SelectItem key={c.id} value={c.id} className="text-[#f5f5f5] focus:bg-[#222228]">
-                        <span className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.cor }} />
-                          {c.nome}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              )}
+              <select
+                value={form.categoriaId}
+                onChange={(e) => setForm((f) => ({ ...f, categoriaId: e.target.value }))}
+                className="w-full h-9 px-3 bg-[#1a1a1f] border border-[#27272a] rounded-xl text-sm text-[#f5f5f5] focus:outline-none focus:ring-1 focus:ring-[#f97316]/50 focus:border-[#f97316]/60 transition-colors"
+              >
+                <option value="" disabled>Selecionar categoria...</option>
+                {categoriasFiltradas.length === 0 ? (
+                  <option disabled>Nenhuma categoria de {form.tipo} cadastrada</option>
+                ) : (
+                  categoriasFiltradas.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))
+                )}
+              </select>
             </div>
 
             {/* Forma de pagamento — só para despesas */}
@@ -518,19 +517,16 @@ export default function TransacoesPage() {
                 <Label className="text-[#a1a1aa] text-xs mb-1.5 block">
                   Conta{form.tipo === "despesa" ? " (opcional)" : ""}
                 </Label>
-                <Select value={form.contaId || "__none__"} onValueChange={(v) => setForm((f) => ({ ...f, contaId: !v || v === "__none__" ? "" : v }))}>
-                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50 w-full">
-                    <SelectValue placeholder="Nenhuma" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
-                    <SelectItem value="__none__" className="text-[#a1a1aa] focus:bg-[#222228]">Nenhuma</SelectItem>
-                    {contas.map((c) => (
-                      <SelectItem key={c.id} value={c.id} className="text-[#f5f5f5] focus:bg-[#222228]">
-                        {c.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  value={form.contaId}
+                  onChange={(e) => setForm((f) => ({ ...f, contaId: e.target.value }))}
+                  className="w-full h-9 px-3 bg-[#1a1a1f] border border-[#27272a] rounded-xl text-sm text-[#f5f5f5] focus:outline-none focus:ring-1 focus:ring-[#f97316]/50 focus:border-[#f97316]/60 transition-colors"
+                >
+                  <option value="">Nenhuma</option>
+                  {contas.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
               </div>
             )}
 
@@ -538,22 +534,16 @@ export default function TransacoesPage() {
             {form.tipo === "despesa" && (form.formaPagamento === "credito" || form.formaPagamento === "debito") && (
               <div>
                 <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Cartão</Label>
-                <Select value={form.cartaoId || "__none__"} onValueChange={(v) => setForm((f) => ({ ...f, cartaoId: !v || v === "__none__" ? "" : v }))}>
-                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50 w-full">
-                    <SelectValue placeholder="Selecionar cartão..." />
-                  </SelectTrigger>
-                  <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
-                    <SelectItem value="__none__" className="text-[#a1a1aa] focus:bg-[#222228]">Nenhum</SelectItem>
-                    {cartoes.map((c) => (
-                      <SelectItem key={c.id} value={c.id} className="text-[#f5f5f5] focus:bg-[#222228]">
-                        <span className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.cor }} />
-                          {c.nome}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <select
+                  value={form.cartaoId}
+                  onChange={(e) => setForm((f) => ({ ...f, cartaoId: e.target.value }))}
+                  className="w-full h-9 px-3 bg-[#1a1a1f] border border-[#27272a] rounded-xl text-sm text-[#f5f5f5] focus:outline-none focus:ring-1 focus:ring-[#f97316]/50 focus:border-[#f97316]/60 transition-colors"
+                >
+                  <option value="">Nenhum</option>
+                  {cartoes.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
               </div>
             )}
 
