@@ -346,7 +346,7 @@ export default function TransacoesPage() {
                     >
                       {/* Bolinha da categoria */}
                       <div
-                        className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+                        className="w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ background: t.categoria.cor }}
                       />
 
@@ -355,7 +355,7 @@ export default function TransacoesPage() {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium text-[#f5f5f5] truncate">{t.descricao}</p>
                           {t.recorrente && (
-                            <RefreshCw size={11} className="text-[#52525b] flex-shrink-0" />
+                            <RefreshCw size={11} className="text-[#52525b] shrink-0" />
                           )}
                         </div>
                         <div className="flex items-center gap-2 mt-0.5">
@@ -468,26 +468,27 @@ export default function TransacoesPage() {
             {/* Categoria */}
             <div>
               <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Categoria</Label>
-              <Select value={form.categoriaId} onValueChange={(v) => setForm((f) => ({ ...f, categoriaId: v ?? "" }))}>
-                <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50">
-                  <SelectValue placeholder="Selecionar...">
-                    {form.categoriaId ? (() => { const c = categorias.find(x => x.id === form.categoriaId); return c ? <span className="flex items-center gap-2"><span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.cor }} />{c.nome}</span> : null; })() : null}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
-                  {categoriasFiltradas.length === 0
-                    ? <SelectItem value="__none__" disabled>Nenhuma categoria disponível</SelectItem>
-                    : categoriasFiltradas.map((c) => (
-                        <SelectItem key={c.id} value={c.id} className="text-[#f5f5f5] focus:bg-[#222228]">
-                          <span className="flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.cor }} />
-                            {c.nome}
-                          </span>
-                        </SelectItem>
-                      ))
-                  }
-                </SelectContent>
-              </Select>
+              {categoriasFiltradas.length === 0 ? (
+                <div className="h-9 flex items-center px-3 bg-[#1a1a1f] border border-[#27272a] rounded-lg text-xs text-[#52525b]">
+                  Nenhuma categoria de {form.tipo} cadastrada
+                </div>
+              ) : (
+                <Select value={form.categoriaId} onValueChange={(v) => setForm((f) => ({ ...f, categoriaId: v ?? "" }))}>
+                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50 w-full">
+                    <SelectValue placeholder="Selecionar categoria..." />
+                  </SelectTrigger>
+                  <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
+                    {categoriasFiltradas.map((c) => (
+                      <SelectItem key={c.id} value={c.id} className="text-[#f5f5f5] focus:bg-[#222228]">
+                        <span className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: c.cor }} />
+                          {c.nome}
+                        </span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
             </div>
 
             {/* Forma de pagamento — só para despesas */}
@@ -518,13 +519,8 @@ export default function TransacoesPage() {
                   Conta{form.tipo === "despesa" ? " (opcional)" : ""}
                 </Label>
                 <Select value={form.contaId || "__none__"} onValueChange={(v) => setForm((f) => ({ ...f, contaId: !v || v === "__none__" ? "" : v }))}>
-                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50">
-                    <SelectValue placeholder="Selecionar conta...">
-                      {form.contaId && form.contaId !== "__none__"
-                        ? contas.find(c => c.id === form.contaId)?.nome
-                        : <span className="text-[#52525b]">Nenhuma</span>
-                      }
-                    </SelectValue>
+                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50 w-full">
+                    <SelectValue placeholder="Nenhuma" />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
                     <SelectItem value="__none__" className="text-[#a1a1aa] focus:bg-[#222228]">Nenhuma</SelectItem>
@@ -543,13 +539,8 @@ export default function TransacoesPage() {
               <div>
                 <Label className="text-[#a1a1aa] text-xs mb-1.5 block">Cartão</Label>
                 <Select value={form.cartaoId || "__none__"} onValueChange={(v) => setForm((f) => ({ ...f, cartaoId: !v || v === "__none__" ? "" : v }))}>
-                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50">
-                    <SelectValue placeholder="Selecionar cartão...">
-                      {form.cartaoId && form.cartaoId !== "__none__"
-                        ? cartoes.find(c => c.id === form.cartaoId)?.nome
-                        : <span className="text-[#52525b]">Selecionar...</span>
-                      }
-                    </SelectValue>
+                  <SelectTrigger className="bg-[#1a1a1f] border-[#27272a] text-[#f5f5f5] focus:ring-[#f97316]/50 w-full">
+                    <SelectValue placeholder="Selecionar cartão..." />
                   </SelectTrigger>
                   <SelectContent className="bg-[#1a1a1f] border-[#27272a]">
                     <SelectItem value="__none__" className="text-[#a1a1aa] focus:bg-[#222228]">Nenhum</SelectItem>
@@ -660,7 +651,7 @@ export default function TransacoesPage() {
 
           <div className="mt-3 space-y-4">
             <div className="flex items-start gap-3 bg-[#ef4444]/5 border border-[#ef4444]/20 rounded-xl p-4">
-              <AlertTriangle size={18} className="text-[#ef4444] flex-shrink-0 mt-0.5" />
+              <AlertTriangle size={18} className="text-[#ef4444] shrink-0 mt-0.5" />
               <p className="text-sm text-[#a1a1aa] leading-relaxed">
                 Esta ação é <span className="text-[#f5f5f5] font-medium">permanente</span> e
                 não pode ser desfeita. Todas as transações excluídas serão perdidas.
