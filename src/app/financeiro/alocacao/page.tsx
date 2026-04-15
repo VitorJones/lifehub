@@ -34,14 +34,15 @@ export default function AlocacaoPage() {
   const carregar = useCallback(async () => {
     setLoading(true);
     try {
-      const [resA, resR] = await Promise.all([
-        fetch("/api/alocacoes"),
-        fetch("/api/financeiro/resumo"),
-      ]);
-      const [as, resumo] = await Promise.all([resA.json(), resR.json()]);
-      setAlocacoes(as);
+      const res = await fetch("/api/alocacoes");
+      const data = await res.json();
+      setAlocacoes(Array.isArray(data) ? data : []);
+    } catch { /* silencioso */ }
+    try {
+      const res = await fetch("/api/financeiro/resumo");
+      const resumo = await res.json();
       setRendaMensal(resumo.receitas ?? 0);
-    } finally {
+    } catch { /* renda opcional */ } finally {
       setLoading(false);
     }
   }, []);
